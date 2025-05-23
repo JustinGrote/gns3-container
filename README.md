@@ -1,6 +1,7 @@
-# jsimonetti/gns3-server
-[![](https://images.microbadger.com/badges/version/jsimonetti/gns3-server.svg)](https://microbadger.com/images/jsimonetti/gns3-server "Get your own version badge on microbadger.com")[![](https://images.microbadger.com/badges/image/jsimonetti/gns3-server.svg)](https://microbadger.com/images/jsimonetti/gns3-server "Get your own image badge on microbadger.com")[![](https://img.shields.io/docker/pulls/jsimonetti/gns3-server.svg)]()[![](https://img.shields.io/docker/stars/jsimonetti/gns3-server.svg)]()
+# Ubuntu GNS3 Server
 
+This is a fork of jsimonetti/gns3-server to use Ubuntu instead of Alpine, primarilly to support Cisco IOS-On-Unix (IOU)
+It also has a few quality of life enhancements
 
 ## Usage
 
