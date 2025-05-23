@@ -1,37 +1,50 @@
-# Ubuntu GNS3 Server
+# Ubuntu GNS3 Container
 
-This is a fork of jsimonetti/gns3-server to use Ubuntu instead of Alpine, primarilly to support Cisco IOS-On-Unix (IOU)
-It also has a few quality of life enhancements
+This is a fork of [jsimonetti/gns3-server](https://github.com/jsimonetti/docker-gns3-server) to use Ubuntu instead of 
+Alpine, primarilly to support Cisco IOS-On-Unix (IOU).
 
-## Usage
+It has been optimized to work with [Devcontainers](https://containers.dev/) and has been tested to work in both Docker
+and Podman
+
+## Quick Start
 
 ```
-docker run \
-    --rm -d \
-    --name gns3 \
-    --net=host --privileged \
-    -e BRIDGE_ADDRESS="172.21.1.1/24" \
-    -v <data path>:/data \
-    jsimonetti/gns3-server:latest 
+docker run --sysctl net.ipv4.ip_forward=1 --cap-add NET_ADMIN -p 8080:8080 --rm ghcr.io/justingrote/gns3
+```
+If you have devcontainers or port forwarding enabled you can reach the GNS3 Web UI at
+http://localhost:3080 (note NOT HTTPS by default)
+
+## Bridge Interface
+The container by default creates a bridge interface `gns3net0` which has DHCP. By creating a GNS3 cloud and linking it to this interface, the attached device gets a DHCP address, DNS server, and default gateway . 
+
+I recommend using a GNS3 switch attached to the cloud so you can attach multiple separate devices on their "management" interfaces to this special interface. This repository contains a sample project to get you quickly started with this setup.
+
+![alt text](images/README/image.png)
+
+### Accessing Device Consoles
+Serial Consoles are advertised from the container starting at port 2501 by default. VSCode will automatically detect these and auto-forward them for you. You can also use the GNS3 web interface.
+
+For in-band access, attach the device to the bridge interface and note the IP it receives (by default 172.21.1.x), then configure your routing table to forward to the eth0 address of the container. For example, if your container is named `gns3`, do this in bash which will use the DNS name gns3 that docker should auto-advertise:
+
+```shell
+GNS3_NETWORK=172.21.1.0
+ip route add $GNS3_NETWORK via $(getent hosts gns3 | awk '{ print $1 }')
 ```
 
-## Parameters
+You should now be able to directly ping/ssh/http/whatever to your attached devices at their attached IP addresses.
 
-`The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side. 
-For example with a port -p external:internal - what this shows is the port mapping from internal to external of the container.
-So -p 8080:80 would expose port 80 from inside the container to be accessible from the host's IP on port 8080
-http://192.168.x.x:8080 would show you what's running INSIDE the container on port 80.`
+## Volumes
+All data about the GNS3 is saved persistently to the /data path, which is established as a separate docker volume by default. You can mount your own volume here to persist images, projects, and configuration.
 
+## Container Parameters
 
-* `-v /data` - Path to persistant data
-* `-e BRIDGE_ADDRESS="172.21.1.1/24"` - Configure the internal NAT network bridge for GNS3
+You can override these parameters by specifying them as [Docker environment variables](https://docs.docker.com/reference/cli/docker/container/run/#env).
 
-It is based on alpine-linux edge, for shell access whilst the container is running do `docker exec -it gns3 /bin/sh`.
-
-## Info
-
-This container works best when run priviledged and on a network other then dockers' default (host or macvtap for example).
-If you run on docker's default network you need to expose all ports used by gns3 and consoles yourself.
-
-
-* To monitor the logs of the container in realtime `docker logs -f gns3`.
+| Variable            | Default Value           | Description                                 |
+|---------------------|------------------------|---------------------------------------------|
+| `BRIDGE_NAME`       | `gns3net0`             | Name of the bridge interface                |
+| `BRIDGE_ADDRESS`    | `172.21.1.1/24`        | IP address and subnet for the bridge        |
+| `BRIDGE_DHCP_START` | `172.21.1.10`          | Start of DHCP address range                 |
+| `BRIDGE_DHCP_END`   | `172.21.1.250`         | End of DHCP address range                   |
+| `DHCP_LEASE_AGE`    | `4h`                   | DHCP lease duration                         |
+| `CONFIG`            | `/data/gns3_server.conf` | Path to the GNS3 server configuration file  |
