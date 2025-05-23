@@ -9,12 +9,17 @@ mkdir -p /etc/apt/keyrings
 gpg --keyserver keyserver.ubuntu.com --recv-keys B83AAABFFBD82D21B543C8EA86C22C2EC6A24D7F
 gpg --export B83AAABFFBD82D21B543C8EA86C22C2EC6A24D7F | gpg --dearmor -o /etc/apt/keyrings/gns3-ppa.gpg
 CODENAME=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d= -f2)
-echo "deb [signed-by=/etc/apt/keyrings/gns3-ppa.gpg] http://ppa.launchpad.net/gns3/ppa/ubuntu $CODENAME main" > /etc/apt/sources.list.d/gns3-ppa.list
+echo "deb [signed-by=/etc/apt/keyrings/gns3-ppa.gpg] http://ppa.launchpad.net/gns3/ppa-v3/ubuntu $CODENAME main" > /etc/apt/sources.list.d/gns3-ppa.list
 
 # Install GNS3
 dpkg --add-architecture i386
 apt-get update
-apt-get install -y gns3-server gns3-iou
+apt-get install -y \
+	bridge-utils \
+	dnsmasq \
+	gns3-server \
+	gns3-iou \
+
 apt-get clean && rm -rf /var/lib/apt/lists/*
 SCRIPT
 
