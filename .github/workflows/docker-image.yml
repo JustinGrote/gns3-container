@@ -25,10 +25,14 @@ jobs:
       - name: Convert Repo owner to lowercase for docker compatibility
         run: |
           echo "OWNER=${GITHUB_REPOSITORY_OWNER@L}" >> "${GITHUB_ENV}"
-      - name: Build Docker image
-        run: |
-          docker build -t ghcr.io/$OWNER/gns3:latest .
 
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/$OWNER/gns3:latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ghcr.io/${{ env.OWNER }}/gns3:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
