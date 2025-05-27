@@ -10,6 +10,9 @@ permissions:
   contents: read
 jobs:
   build:
+    environment: 
+      name: Github Packages
+      url: https://ghcr.io/justingrote/gns3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
