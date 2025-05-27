@@ -23,7 +23,7 @@ ip link set dev $BRIDGE_NAME up
 ip address add ${BRIDGE_ADDRESS} dev $BRIDGE_NAME
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
-dnsmasq -i $BRIDGE_NAME -z -h --dhcp-range=$BRIDGE_DHCP_START,$BRIDGE_DHCP_END,$DHCP_LEASE_AGE
+dnsmasq -i $BRIDGE_NAME -z -h --dhcp-sequential-ip --dhcp-range=$BRIDGE_DHCP_START,$BRIDGE_DHCP_END,$DHCP_LEASE_AGE 
 
 echo "Starting GNS3 with config path: $CONFIG"
 gns3server -A --config $CONFIG
