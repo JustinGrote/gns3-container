@@ -15,7 +15,9 @@ If you have devcontainers or port forwarding enabled you can reach the GNS3 Web 
 http://localhost:3080 (note NOT HTTPS by default)
 
 ## Bridge Interface
-The container by default creates a bridge interface `gns3net0` which has DHCP. By creating a GNS3 cloud and linking it to this interface, the attached device gets a DHCP address, DNS server, and default gateway . 
+The container by default creates a bridge interface `gns3net0` which has DHCP. By creating a GNS3 cloud and linking it to this interface, the attached device gets a DHCP address, DNS server, and default gateway. 
+
+IP Addresses start at 172.21.1.10 by default and increment sequentially, so the first device you attach will be 172.21.1.10, next will be 172.21.1.11, and so on.
 
 I recommend using a GNS3 switch attached to the cloud so you can attach multiple separate devices on their "management" interfaces to this special interface. This repository contains a sample project to get you quickly started with this setup.
 
